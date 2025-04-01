@@ -32,7 +32,7 @@ import Twilio from 'twilio/lib/rest/Twilio';
     async create(@Body() createUserDto: CreateUserDto) {
       //await this.usersService.createWithEmail(createUserDto);
       await this.usersService.createWithPhoneNumber(createUserDto);
-      return { message: 'User registered successfully. Please check your phone number for verification code.' };
+      return { message: 'User registered successfully. Please check your phone for verification code.' };
     }
   
     @Post('verify-email')

@@ -30,7 +30,10 @@ export class UsersService implements UserServiceInterface {
 
   async createWithEmail(createUserDto: CreateUserDto): Promise<User> {
     // Check if user already exists
-    const existingUser = await this.userModel.findOne({ email: createUserDto.email }).exec();
+    const existingUser = await this.userModel.findOne({ $or: [
+      { phoneNumber: createUserDto.phoneNumber },
+      { email: createUserDto.email }, ], }).exec();
+      
     if (existingUser) {
       throw new ConflictException('Email already registered');
     }
@@ -66,9 +69,11 @@ export class UsersService implements UserServiceInterface {
 
   async createWithPhoneNumber(createUserDto: CreateUserDto): Promise<User> {
     // Check if user already exists with phone number
-    const existingUser = await this.userModel.findOne({ phoneNumber: createUserDto.phoneNumber }).exec();
+    const existingUser = await this.userModel.findOne({ $or: [
+      { phoneNumber: createUserDto.phoneNumber },
+      { email: createUserDto.email }, ], }).exec();
     if (existingUser) {
-      throw new ConflictException('Phone number already registered');
+      throw new ConflictException('Email or Phone number already registered');
     }
 
     // Hash password
