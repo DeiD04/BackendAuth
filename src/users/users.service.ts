@@ -28,14 +28,16 @@ export class UsersService implements UserServiceInterface {
     return userObj as User;
   }
 
-  async createWithEmail(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     // Check if user already exists
-    const existingUser = await this.userModel.findOne({ $or: [
+    const existingUser = await this.userModel.findOne({ $or: 
+    [
       { phoneNumber: createUserDto.phoneNumber },
-      { email: createUserDto.email }, ], }).exec();
+      { email: createUserDto.email }, 
+    ], }).exec();
       
     if (existingUser) {
-      throw new ConflictException('Email already registered');
+      throw new ConflictException('Email or Phone number already registered');
     }
 
     // Hash password
@@ -44,7 +46,7 @@ export class UsersService implements UserServiceInterface {
     // Generate verification code
     const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); 
     const verificationCodeExpires = new Date();
-    verificationCodeExpires.setMinutes(verificationCodeExpires.getMinutes() + 2); 
+    verificationCodeExpires.setMinutes(verificationCodeExpires.getMinutes() + 5); 
 
     // Create new user
     const newUser = new this.userModel({
@@ -61,44 +63,6 @@ export class UsersService implements UserServiceInterface {
       savedUser.email,
       savedUser.name,
       verificationCode,
-    );
-
-    // Return user without sensitive data
-    return this.toUserInterface(savedUser);
-  }
-
-  async createWithPhoneNumber(createUserDto: CreateUserDto): Promise<User> {
-    // Check if user already exists with phone number
-    const existingUser = await this.userModel.findOne({ $or: [
-      { phoneNumber: createUserDto.phoneNumber },
-      { email: createUserDto.email }, ], }).exec();
-    if (existingUser) {
-      throw new ConflictException('Email or Phone number already registered');
-    }
-
-    // Hash password
-    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
-
-    // Generate verification code
-    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); 
-    const verificationCodeExpires = new Date();
-    verificationCodeExpires.setMinutes(verificationCodeExpires.getMinutes() + 2); 
-
-    // Create new user
-    const newUser = new this.userModel({
-      ...createUserDto,
-      password: hashedPassword,
-      verificationCode,
-      verificationCodeExpires
-    });
-
-    const savedUser = await newUser.save();
-
-    //Send verification phone number
-    await this.smsService.sendVerificationPhoneNumber(
-      savedUser.phoneNumber,
-      savedUser.name,
-      verificationCode
     );
 
     // Return user without sensitive data
@@ -134,7 +98,50 @@ export class UsersService implements UserServiceInterface {
     return { message: 'Email verified successfully' };
   }
 
-  async verifyPhoneNumber(verifyPhoneNumberDto: VerifyPhoneNumberDto): Promise<{ message: string }> {
+  async login(loginDto: LoginDto): Promise<User> {
+    const user = await this.userModel.findOne({ email: loginDto.email }).exec();
+    
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Check if user is verified
+    if (!user.isVerified) {
+      throw new UnauthorizedException('Please verify your email before logging in');
+    }
+
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    // Generate verification code
+    const verificationCode = Math.floor(100000 + Math.random() * 900000).toString(); 
+    const verificationCodeExpires = new Date();
+    verificationCodeExpires.setMinutes(verificationCodeExpires.getMinutes() + 2); 
+
+    // Asign values to user
+    user.verificationCode = verificationCode;
+    user.verificationCodeExpires = verificationCodeExpires;
+    user.isVerified = false;
+
+    //Send verification phone number
+    await this.smsService.sendVerificationPhoneNumber(
+      user.phoneNumber,
+      user.name,
+      verificationCode
+    );
+
+    user.save();
+    
+    // Return user without sensitive data
+    return this.toUserInterface(user);
+  }
+
+  async verifyPhoneNumber(verifyPhoneNumberDto: VerifyPhoneNumberDto): 
+    Promise<{ accessToken: string; refreshToken: string; user: User }> {
+
     const { phoneNumber, code } = verifyPhoneNumberDto;
 
     const user = await this.userModel.findOne({ phoneNumber }).exec();
@@ -155,28 +162,6 @@ export class UsersService implements UserServiceInterface {
     user.isVerified = true;
     user.verificationCode = undefined;
     user.verificationCodeExpires = undefined;
-    await user.save();
-
-    return { message: 'Phone number verified successfully' };
-  }
-
-  async login(loginDto: LoginDto): Promise<{ accessToken: string; refreshToken: string; user: User }> {
-    const user = await this.userModel.findOne({ email: loginDto.email }).exec();
-    
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    // Check if user is verified
-    if (!user.isVerified) {
-      throw new UnauthorizedException('Please verify your email before logging in');
-    }
-
-    // Compare passwords
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
 
     // Generate tokens
     // Access the _id as a property of the document

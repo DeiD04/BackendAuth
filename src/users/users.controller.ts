@@ -30,9 +30,8 @@ import Twilio from 'twilio/lib/rest/Twilio';
   
     @Post('signup')
     async create(@Body() createUserDto: CreateUserDto) {
-      //await this.usersService.createWithEmail(createUserDto);
-      await this.usersService.createWithPhoneNumber(createUserDto);
-      return { message: 'User registered successfully. Please check your phone for verification code.' };
+      await this.usersService.create(createUserDto);
+      return { message: 'User registered successfully. Please check your email for verification code.' };
     }
   
     @Post('verify-email')
@@ -40,15 +39,16 @@ import Twilio from 'twilio/lib/rest/Twilio';
       return this.usersService.verifyEmail(verifyEmailDto);
     }
 
+    @HttpCode(HttpStatus.OK)
+    @Post('login')
+    async login(@Body() loginDto: LoginDto) {
+      await this.usersService.login(loginDto);
+      return { message: 'Please check your phone for verification code.' };
+    }
+
     @Post('verify-phoneNumber')
     verifyPhoneNumber(@Body() verifyNumberDto: VerifyPhoneNumberDto) {
         return this.usersService.verifyPhoneNumber(verifyNumberDto);
-    }
-  
-    @HttpCode(HttpStatus.OK)
-    @Post('login')
-    login(@Body() loginDto: LoginDto) {
-      return this.usersService.login(loginDto);
     }
   
     @HttpCode(HttpStatus.OK)
