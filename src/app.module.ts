@@ -6,6 +6,7 @@ import { AbilitiesModule } from './abilities/abilities.module';
 import { JwtAuthGuard } from './users/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './users/guards/roles.guard';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { RolesGuard } from './users/guards/roles.guard';
       }),
     }),
     UsersModule,
+    ProductsModule,
     AbilitiesModule
   ],
   providers: [
