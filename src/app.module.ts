@@ -2,6 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UsersModule } from './users/users.module';
+import { AbilitiesModule } from './abilities/abilities.module';
+import { JwtAuthGuard } from './users/guards/jwt-auth.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from ''
 
 @Module({
   imports: [
@@ -16,6 +20,17 @@ import { UsersModule } from './users/users.module';
       }),
     }),
     UsersModule,
+    AbilitiesModule
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
   ],
 })
 export class AppModule {}
