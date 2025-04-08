@@ -53,6 +53,28 @@ export class AbilityFactory{
                 conditions: { createdBy: userId },
             });
 
+            rules.push({
+                action: Action.Read,
+                subject: 'all',
+            });
+
+            rules.push({
+                action: Action.Create,
+                subject: 'Category',
+            });
+
+            rules.push({
+                action: Action.Update,
+                subject: 'Category',
+                conditions: { createdBy: userId },
+            });
+
+            rules.push({
+                action: Action.Delete,
+                subject: 'Category',
+                conditions: { createdBy: userId },
+            });
+
             if (user.role === UserRole.ADMIN) {
                 rules.push({
                     action: Action.Manage,
