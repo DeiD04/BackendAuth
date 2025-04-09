@@ -21,8 +21,6 @@ import {
     VerifyPhoneNumberDto
   } from './dto/user.dto';
   import { JwtAuthGuard } from './guards/jwt-auth.guard';
-  import twilio from 'twilio';
-  import Twilio from 'twilio/lib/rest/Twilio';
   import { Public } from './decorators/public.decorator';
   
   @Controller('users')
@@ -36,12 +34,14 @@ import {
       return { message: 'User registered successfully. Please check your email for verification code.' };
     }
   
+    @Public()
     @Post('verify-email')
     verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
       return this.usersService.verifyEmail(verifyEmailDto);
     }
 
     @HttpCode(HttpStatus.OK)
+    @Public()
     @Post('login')
     async login(@Body() loginDto: LoginDto) {
       await this.usersService.login(loginDto);
@@ -49,6 +49,7 @@ import {
     }
 
     @Post('verify-phoneNumber')
+    @Public()
     verifyPhoneNumber(@Body() verifyNumberDto: VerifyPhoneNumberDto) {
         return this.usersService.verifyPhoneNumber(verifyNumberDto);
     }

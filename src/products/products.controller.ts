@@ -13,7 +13,7 @@ import { ProductsService } from './products.service';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
 import { Public } from '../users/decorators/public.decorator';
 import { CheckPolicies } from '../users/decorators/check-policies.decorator';
-import { AbilityFactory, Action } from 'src/abilities/abilities.factory';
+import { AbilityFactory, Action } from '../abilities/abilities.factory';
 
 @Controller('products')
 export class ProductsController {

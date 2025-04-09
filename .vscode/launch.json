@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "NestJS Debug",
+        "type": "node",
+        "request": "launch",
+        "runtimeArgs": ["-r", "ts-node/register", "-r", "tsconfig-paths/register"],
+        "args": ["${workspaceFolder}/src/main.ts"],
+        "cwd": "${workspaceFolder}",
+        "autoAttachChildProcesses": true,
+        "internalConsoleOptions": "openOnSessionStart",
+        "skipFiles": ["<node_internals>/**", "node_modules/**"]
+      }
+    ]
+  }
+  
