@@ -21,8 +21,6 @@ import {
     VerifyPhoneNumberDto
   } from './dto/user.dto';
   import { JwtAuthGuard } from './guards/jwt-auth.guard';
-  import twilio from 'twilio';
-import Twilio from 'twilio/lib/rest/Twilio';
   
   @Controller('users')
   export class UsersController {

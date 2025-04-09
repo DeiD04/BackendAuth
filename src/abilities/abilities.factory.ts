@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Types } from "mongoose";
-import { UserRole } from "src/users/dto/user.dto";
+import { UserRole } from "../users/dto/user.dto";
 
 export enum Action {
     Manage = 'manage',

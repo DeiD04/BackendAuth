@@ -20,5 +20,9 @@ export class Product {
 
   @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'User' })
   createdBy: string;
+
+  @Prop({ type: MongooseSchema.Types.ObjectId, ref: 'Category', required: false })
+  category: string;
 }
+
 export const ProductSchema = SchemaFactory.createForClass(Product);

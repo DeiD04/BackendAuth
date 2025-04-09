@@ -4,12 +4,15 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Product, ProductDocument } from './schema/product.schema';
 import { CreateProductDto, UpdateProductDto } from './dto/product.dto';
+import { Category, CategoryDocument } from 'src/category/schema/category.schema';
 
 @Injectable()
 export class ProductsService {
   constructor(
     @InjectModel(Product.name) private productModel: Model<ProductDocument>,
-  ) {}
+    @InjectModel(Category.name) private categoryModel: Model<CategoryDocument>,
+
+  ) { }
 
   async findAll(userId?: string): Promise<Product[]> {
     const query = userId ? { createdBy: userId } : {};
@@ -25,6 +28,13 @@ export class ProductsService {
   }
 
   async create(createProductDto: CreateProductDto, userId: string): Promise<Product> {
+
+    if (createProductDto.category) {
+      const categoryFinded = await this.categoryModel.findById(createProductDto.category);
+      if (categoryFinded) {
+        throw new NotFoundException(`Cateogy id ${createProductDto.category} not found`);
+      }
+    }
     const newProduct = new this.productModel({
       ...createProductDto,
       createdBy: userId,
@@ -38,6 +48,12 @@ export class ProductsService {
       .exec();
     if (!updatedProduct) {
       throw new NotFoundException(`Product with ID ${id} not found`);
+    }
+    if (updateProductDto.category) {
+      const categoryFinded = await this.categoryModel.findById(updateProductDto.category);
+      if (categoryFinded) {
+        throw new NotFoundException(`Cateogy id ${updateProductDto.category} not found`);
+      }
     }
     return updatedProduct;
   }
