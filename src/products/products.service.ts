@@ -31,7 +31,7 @@ export class ProductsService {
 
     if (createProductDto.category) {
       const categoryFinded = await this.categoryModel.findById(createProductDto.category);
-      if (categoryFinded) {
+      if (!categoryFinded) {
         throw new NotFoundException(`Cateogy id ${createProductDto.category} not found`);
       }
     }
@@ -51,7 +51,7 @@ export class ProductsService {
     }
     if (updateProductDto.category) {
       const categoryFinded = await this.categoryModel.findById(updateProductDto.category);
-      if (categoryFinded) {
+      if (!categoryFinded) {
         throw new NotFoundException(`Cateogy id ${updateProductDto.category} not found`);
       }
     }
