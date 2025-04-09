@@ -1,6 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common";
 import { Types } from "mongoose";
-import { UserRole } from "src/users/dto/user.dto";
+import { UserRole } from "../users/dto/user.dto";
 
 export enum Action {
     Manage = 'manage',
@@ -50,6 +50,28 @@ export class AbilityFactory{
             rules.push({
                 action: Action.Delete,
                 subject: 'Product',
+                conditions: { createdBy: userId },
+            });
+
+            rules.push({
+                action: Action.Read,
+                subject: 'all',
+            });
+
+            rules.push({
+                action: Action.Create,
+                subject: 'Category',
+            });
+
+            rules.push({
+                action: Action.Update,
+                subject: 'Category',
+                conditions: { createdBy: userId },
+            });
+
+            rules.push({
+                action: Action.Delete,
+                subject: 'Category',
                 conditions: { createdBy: userId },
             });
 

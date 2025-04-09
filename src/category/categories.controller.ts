@@ -13,7 +13,7 @@ import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { Public } from '../users/decorators/public.decorator';
 import { CheckPolicies } from '../users/decorators/check-policies.decorator';
-import { AbilityFactory, Action } from 'src/abilities/abilities.factory';
+import { AbilityFactory, Action } from '../abilities/abilities.factory';
 
 @Controller('category')
 export class CategorysController {
