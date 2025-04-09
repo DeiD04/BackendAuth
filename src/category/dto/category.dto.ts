@@ -20,6 +20,7 @@ export class CreateCategoryDto{
     isActive?: boolean;
 
     @IsOptional()
+    @IsString()
     image?: string;
 }
 
@@ -37,6 +38,7 @@ export class UpdateCategoryDto{
     isActive?: boolean;
 
     @IsOptional()
+    @IsString()
     image?: string;
 }
 

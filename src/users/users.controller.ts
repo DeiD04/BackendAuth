@@ -22,12 +22,14 @@ import {
   } from './dto/user.dto';
   import { JwtAuthGuard } from './guards/jwt-auth.guard';
   import twilio from 'twilio';
-import Twilio from 'twilio/lib/rest/Twilio';
+  import Twilio from 'twilio/lib/rest/Twilio';
+  import { Public } from './decorators/public.decorator';
   
   @Controller('users')
   export class UsersController {
     constructor(private readonly usersService: UsersService) {}
   
+    @Public()
     @Post('signup')
     async create(@Body() createUserDto: CreateUserDto) {
       await this.usersService.create(createUserDto);

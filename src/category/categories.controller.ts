@@ -8,12 +8,16 @@ import {
   Param,
   Request,
   ForbiddenException,
+  UseInterceptors,
+  UploadedFile,
+  NotFoundException,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto, UpdateCategoryDto } from './dto/category.dto';
 import { Public } from '../users/decorators/public.decorator';
 import { CheckPolicies } from '../users/decorators/check-policies.decorator';
 import { AbilityFactory, Action } from 'src/abilities/abilities.factory';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('category')
 export class CategorysController {
@@ -36,15 +40,19 @@ export class CategorysController {
 
   @CheckPolicies({ action: Action.Create, subject: 'Category' })
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto, @Request() req) {
+  @UseInterceptors(FileInterceptor('image'))
+  create(@Body() createCategoryDto: CreateCategoryDto, @UploadedFile() file: Express.Multer.File, @Request() req) {
+    createCategoryDto.image = file.path;
     return this.categoriesService.create(createCategoryDto, req.user.id);
   }
 
   @CheckPolicies({ action: Action.Update, subject: 'Category', checkData: true })
+  @UseInterceptors(FileInterceptor('image'))
   @Put(':id')
   async update(
     @Param('id') id: string,
     @Body() updateCategoryDto: UpdateCategoryDto,
+    @UploadedFile() file: Express.Multer.File,
     @Request() req,
   ) {
     const category = await this.categoriesService.findById(id);
@@ -54,7 +62,7 @@ export class CategorysController {
     if (!this.abilityFactory.can(ability, Action.Update, 'Category', category)) {
       throw new ForbiddenException('You can only update your own category');
     }
-    
+    updateCategoryDto.image = file.path;
     return this.categoriesService.update(id, updateCategoryDto);
   }
 

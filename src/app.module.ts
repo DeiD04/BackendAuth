@@ -7,6 +7,7 @@ import { JwtAuthGuard } from './users/guards/jwt-auth.guard';
 import { APP_GUARD } from '@nestjs/core';
 import { RolesGuard } from './users/guards/roles.guard';
 import { ProductsModule } from './products/products.module';
+import { CategoriesModule } from './category/categories.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { ProductsModule } from './products/products.module';
     }),
     UsersModule,
     ProductsModule,
+    CategoriesModule,
     AbilitiesModule
   ],
   providers: [
